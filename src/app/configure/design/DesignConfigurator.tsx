@@ -67,3 +67,4 @@ const DesignConfigurator = ({
 export default DesignConfigurator;
 //width={imageDimensions.width}
 //height={imageDimensions.height}
+//
