@@ -1,9 +1,13 @@
 "use client";
 import HandleComponent from "@/app/components/HandleComponent";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
+import { Label, RadioGroup } from "@headlessui/react";
+import { useState } from "react";
+import { COLORS } from "@/validators/option-validator";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -16,9 +20,13 @@ const DesignConfigurator = ({
   imageUrl,
   imageDimensions,
 }: DesignConfiguratorProps) => {
+  const [options, setOptions] = useState<{ color: (typeof COLORS)[number] }>({
+    color: COLORS[0],
+  });
   return (
-    <div className="relative mt-20 grid grid-cols-3 mb-20 pb-20">
-      <div className="relative h-150 overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+    <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20 pb-20">
+      {/* Left column: phone preview (spans 2 cols on lg) */}
+      <div className="relative h-150 overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
         {/* allow pointer events on the container so the draggable area can receive events */}
         <div className="relative w-60 bg-opacity-50 aspect-896/1831">
           <AspectRatio
@@ -68,10 +76,38 @@ const DesignConfigurator = ({
           </Rnd>
         </div>
       </div>
+
+      {/* Right column: Scroll area */}
+      <div className="h-150 w-full col-span-full lg:col-span-1 flex flex-col bg-white">
+        <ScrollArea className="relative flex-1 overflow-auto">
+          <div
+            aria-hidden="true"
+            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-linear-to-t  from-white pointer-events-none"
+          />
+          <div className="px-8 pb-12 pt-8">
+            <h2 className="tracking-tight font-bold text-3xl text-black">
+              Customize your case
+            </h2>
+            {/* put other controls here (text, sliders, color pickers) */}
+            <div className="w-full h-px bg-zinc-200 my-6" />
+            <div className="relative mt-4 h-full flex flex-col justify-between">
+              <RadioGroup
+                value={options.color}
+                onChange={(val) => {
+                  setOptions((prev) => ({
+                    ...prev,
+                    color: val,
+                  }));
+                }}
+              >
+                <Label>Color: {options.color.label}</Label>
+                <div></div>
+              </RadioGroup>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
 export default DesignConfigurator;
-//width={imageDimensions.width}
-//height={imageDimensions.height}
-//
