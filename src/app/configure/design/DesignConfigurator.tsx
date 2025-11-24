@@ -5,9 +5,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
-import { Label, RadioGroup } from "@headlessui/react";
+import { RadioGroup } from "@headlessui/react";
 import { useState } from "react";
-import { COLORS } from "@/validators/option-validator";
+import { COLORS, MODELS } from "@/validators/option-validator";
+import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -20,9 +26,23 @@ const DesignConfigurator = ({
   imageUrl,
   imageDimensions,
 }: DesignConfiguratorProps) => {
-  const [options, setOptions] = useState<{ color: (typeof COLORS)[number] }>({
+  const [options, setOptions] = useState<{
+    color: (typeof COLORS)[number];
+    model: (typeof MODELS.options)[number];
+  }>({
     color: COLORS[0],
+    model: MODELS.options[0],
   });
+  const TW_BG_MAP: Record<string, string> = {
+    "zinc-900": "bg-zinc-900",
+    "blue-950": "bg-blue-950",
+    "rose-950": "bg-rose-950",
+  };
+  const TW_BORDER_MAP: Record<string, string> = {
+    "zinc-900": "border-zinc-900",
+    "blue-950": "border-blue-950",
+    "rose-950": "border-rose-950",
+  };
   return (
     <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20 pb-20">
       {/* Left column: phone preview (spans 2 cols on lg) */}
@@ -41,14 +61,14 @@ const DesignConfigurator = ({
               className="pointer-events-none z-50 select-none"
             />
           </AspectRatio>
-          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)]">
-            <div
-              className={cn(
-                "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl ",
-                "bg-blue-950"
-              )}
-            />
-          </div>
+          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)]" />
+          <div
+            className={cn(
+              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl",
+              TW_BG_MAP[options.color.tw]
+            )}
+          />
+
           <Rnd
             default={{
               x: 150,
@@ -91,18 +111,56 @@ const DesignConfigurator = ({
             {/* put other controls here (text, sliders, color pickers) */}
             <div className="w-full h-px bg-zinc-200 my-6" />
             <div className="relative mt-4 h-full flex flex-col justify-between">
-              <RadioGroup
-                value={options.color}
-                onChange={(val) => {
-                  setOptions((prev) => ({
-                    ...prev,
-                    color: val,
-                  }));
-                }}
-              >
-                <Label>Color: {options.color.label}</Label>
-                <div></div>
-              </RadioGroup>
+              <div className="flex flex-col gap-6">
+                <RadioGroup
+                  value={options.color}
+                  onChange={(val) => {
+                    setOptions((prev) => ({
+                      ...prev,
+                      color: val,
+                    }));
+                  }}
+                >
+                  <Label>Color: {options.color.label}</Label>
+                  <div className="mt-3 flex items-center space-x-3">
+                    {COLORS.map((color) => (
+                      <RadioGroup.Option
+                        key={color.label}
+                        value={color}
+                        className={({ active, checked }) =>
+                          cn(
+                            "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 active:ring-0 focus:ring-0 active:outline-none focus:outline-none border-2",
+                            active || checked
+                              ? TW_BORDER_MAP[color.tw]
+                              : "border-transparent"
+                          )
+                        }
+                      >
+                        <span
+                          className={cn(
+                            TW_BG_MAP[color.tw],
+                            "h-8 w-8 rounded-full border border-black border-opacity-10"
+                          )}
+                        />
+                      </RadioGroup.Option>
+                    ))}
+                  </div>
+                </RadioGroup>
+                <div className="relative flex flex-col gap-3 w-full">
+                  <Label>Model</Label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full  justify-between"
+                      >
+                        {options.model.label}
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
           </div>
         </ScrollArea>
