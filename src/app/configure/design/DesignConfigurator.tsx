@@ -11,9 +11,12 @@ import { COLORS, MODELS } from "@/validators/option-validator";
 import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Check, ChevronDownIcon, ChevronsUpDownIcon } from "lucide-react";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -156,8 +159,36 @@ const DesignConfigurator = ({
                         className="w-full  justify-between"
                       >
                         {options.model.label}
+                        <ChevronsUpDownIcon className="ml-2 h-4 w-4 opacity-50" />
                       </Button>
                     </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {MODELS.options.map((model) => (
+                        <DropdownMenuItem
+                          key={model.label}
+                          className={cn(
+                            "flex text-sm gap-1 items-center p-1.5 cursor-default hover:bg-zinc-100",
+                            {
+                              "bg-zinc-100":
+                                model.label === options.model.label,
+                            }
+                          )}
+                          onClick={() => {
+                            setOptions((prev) => ({ ...prev, model }));
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              model.label === options.model.label
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {model.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
