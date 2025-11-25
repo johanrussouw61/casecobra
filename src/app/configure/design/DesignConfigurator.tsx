@@ -2,12 +2,17 @@
 import HandleComponent from "@/app/components/HandleComponent";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
 import { RadioGroup } from "@headlessui/react";
 import { useState } from "react";
-import { COLORS, MODELS } from "@/validators/option-validator";
+import {
+  COLORS,
+  FINISHES,
+  MATERIALS,
+  MODELS,
+} from "@/validators/option-validator";
 import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
@@ -32,9 +37,13 @@ const DesignConfigurator = ({
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
     model: (typeof MODELS.options)[number];
+    material: (typeof MATERIALS.options)[number];
+    finish: (typeof FINISHES.options)[number];
   }>({
     color: COLORS[0],
     model: MODELS.options[0],
+    material: MATERIALS.options[0],
+    finish: FINISHES.options[0],
   });
   const TW_BG_MAP: Record<string, string> = {
     "zinc-900": "bg-zinc-900",
@@ -64,10 +73,10 @@ const DesignConfigurator = ({
               className="pointer-events-none z-50 select-none"
             />
           </AspectRatio>
-          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)]" />
+          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)] pointer-events-none" />
           <div
             className={cn(
-              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl",
+              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl pointer-events-none",
               TW_BG_MAP[options.color.tw]
             )}
           />
@@ -191,6 +200,63 @@ const DesignConfigurator = ({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
+                {[MATERIALS, FINISHES].map(
+                  ({ name, options: selectableOptions }) => (
+                    <div key={name} className="relative">
+                      <Label>
+                        {name.slice(0, 1).toUpperCase() + name.slice(1)}
+                      </Label>
+                      <div className="mt-3">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between"
+                            >
+                              {options[name].label}
+                              <ChevronDownIcon className="ml-2 h-4 w-4 opacity-50" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {selectableOptions.map((option) => (
+                              <DropdownMenuItem
+                                key={option.value}
+                                className={cn(
+                                  "flex items-center justify-between px-3 py-2 text-sm hover:bg-zinc-100",
+                                  {
+                                    "bg-zinc-100":
+                                      option.value === options[name].value,
+                                  }
+                                )}
+                                onClick={() =>
+                                  setOptions((prev) => ({
+                                    ...prev,
+                                    [name]: option,
+                                  }))
+                                }
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Check
+                                    className={cn(
+                                      "h-4 w-4",
+                                      option.value === options[name].value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  <span>{option.label}</span>
+                                </div>
+                                <span className="text-gray-700">
+                                  {formatPrice(option.price / 100)}
+                                </span>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -199,4 +265,5 @@ const DesignConfigurator = ({
     </div>
   );
 };
+
 export default DesignConfigurator;
