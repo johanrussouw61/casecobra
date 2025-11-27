@@ -30,6 +30,9 @@ import {
 } from "lucide-react";
 import { BASE_PRICE } from "@/config/products";
 import { useUploadThing } from "@/lib/uploadthing";
+import { useMutation } from "@tanstack/react-query";
+import { SafeConfigArgs, saveConfig as _saveConfig } from "./actions";
+import { useRouter } from "next/navigation";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -42,6 +45,22 @@ const DesignConfigurator = ({
   imageUrl,
   imageDimensions,
 }: DesignConfiguratorProps) => {
+  const router = useRouter();
+  const { mutate: saveConfig } = useMutation({
+    mutationKey: ["save-config"],
+    mutationFn: async (args: SafeConfigArgs) => {
+      await Promise.all([saveConfiguration(), _saveConfig(args)]);
+    },
+    onError: () => {
+      toast("Something went wrong", {
+        description: "There was an error on our end. Please try again.",
+      });
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`);
+    },
+  });
+
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
     model: (typeof MODELS.options)[number];
@@ -369,7 +388,15 @@ const DesignConfigurator = ({
               </p>
               <div className="bg-green-500 w-full flex flex-col items-center justify-center">
                 <Button
-                  onClick={() => saveConfiguration()}
+                  onClick={() =>
+                    saveConfig({
+                      configId,
+                      color: options.color.value,
+                      finish: options.finish.value,
+                      material: options.material.value,
+                      model: options.model.value,
+                    })
+                  }
                   className="w-full"
                   size="sm"
                 >
