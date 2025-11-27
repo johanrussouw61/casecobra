@@ -99,38 +99,127 @@ const DesignConfigurator = ({
   const { startUpload } = useUploadThing("imageUploader");
 
   async function saveConfiguration() {
-    //if (!phoneCaseRef.current) return
     try {
+      if (!phoneCaseRef.current || !containerRef.current) {
+        throw new Error("missing refs");
+      }
+
       const {
         left: caseLeft,
         top: caseTop,
-        width,
-        height,
-      } = phoneCaseRef.current!.getBoundingClientRect();
+        width: caseWidth,
+        height: caseHeight,
+      } = phoneCaseRef.current.getBoundingClientRect();
+
       const { left: containerLeft, top: containerTop } =
-        containerRef.current!.getBoundingClientRect();
+        containerRef.current.getBoundingClientRect();
+
       const leftOffset = caseLeft - containerLeft;
       const topOffset = caseTop - containerTop;
+
       const actualX = renderedPosition.x - leftOffset;
       const actualY = renderedPosition.y - topOffset;
 
+      // device pixel ratio aware canvas
+      const dpr =
+        typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
       const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = Math.round(caseWidth * dpr);
+      canvas.height = Math.round(caseHeight * dpr);
       const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("could not get canvas context");
+      // keep coordinates in CSS pixels by scaling
+      ctx.scale(dpr, dpr);
 
       const userImage = new Image();
       userImage.crossOrigin = "anonymous";
       userImage.src = imageUrl;
       await new Promise((resolve) => (userImage.onload = resolve));
 
-      ctx?.drawImage(
-        userImage,
-        actualX,
-        actualY,
-        renderedDimension.width,
-        renderedDimension.height
+      // find actual rendered img element (NextImage creates an <img>)
+      const imgEl = containerRef.current.querySelector(
+        'img[alt="your image"]'
+      ) as HTMLImageElement | null;
+
+      let dx = Math.round(actualX);
+      let dy = Math.round(actualY);
+      let dw = Math.round(renderedDimension.width);
+      let dh = Math.round(renderedDimension.height);
+      let imgNaturalW = userImage.naturalWidth || dw;
+      let imgNaturalH = userImage.naturalHeight || dh;
+
+      if (imgEl) {
+        const imgRect = imgEl.getBoundingClientRect();
+        dx = Math.round(imgRect.left - caseLeft);
+        dy = Math.round(imgRect.top - caseTop);
+        dw = Math.round(imgRect.width);
+        dh = Math.round(imgRect.height);
+        imgNaturalW = imgEl.naturalWidth || dw;
+        imgNaturalH = imgEl.naturalHeight || dh;
+      }
+
+      // compute visible portion of the displayed image relative to the phone-case canvas
+      const srcDisplayX = Math.max(0, -dx);
+      const srcDisplayY = Math.max(0, -dy);
+      const srcDisplayW = Math.max(
+        0,
+        Math.min(dw - srcDisplayX, caseWidth - Math.max(0, dx))
       );
+      const srcDisplayH = Math.max(
+        0,
+        Math.min(dh - srcDisplayY, caseHeight - Math.max(0, dy))
+      );
+
+      // debug log to browser console for diagnosis
+      // eslint-disable-next-line no-console
+      console.debug("saveConfiguration debug", {
+        caseLeft,
+        caseTop,
+        caseWidth,
+        caseHeight,
+        renderedPosition,
+        renderedDimension,
+        dx,
+        dy,
+        dw,
+        dh,
+        imgNaturalW,
+        imgNaturalH,
+        srcDisplayX,
+        srcDisplayY,
+        srcDisplayW,
+        srcDisplayH,
+      });
+
+      // clear canvas first
+      ctx.clearRect(0, 0, caseWidth, caseHeight);
+
+      if (srcDisplayW > 0 && srcDisplayH > 0) {
+        const scaleX = imgNaturalW / dw;
+        const scaleY = imgNaturalH / dh;
+
+        const sx = srcDisplayX * scaleX;
+        const sy = srcDisplayY * scaleY;
+        const sWidth = srcDisplayW * scaleX;
+        const sHeight = srcDisplayH * scaleY;
+
+        const destX = Math.max(0, dx);
+        const destY = Math.max(0, dy);
+        const destW = srcDisplayW;
+        const destH = srcDisplayH;
+
+        ctx.drawImage(
+          userImage,
+          sx,
+          sy,
+          sWidth,
+          sHeight,
+          destX,
+          destY,
+          destW,
+          destH
+        );
+      }
 
       const base64 = canvas.toDataURL();
       const base64Data = base64.split(",")[1];
@@ -139,6 +228,8 @@ const DesignConfigurator = ({
       const file = new File([blob], "filename.png", { type: "image/png" });
       await startUpload([file], { configId });
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("saveConfiguration error", err);
       toast("Something went wrong", {
         description: "There was an error on our end. Please try again.",
       });
