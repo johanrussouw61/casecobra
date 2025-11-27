@@ -6,7 +6,8 @@ import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
 import { RadioGroup } from "@headlessui/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   COLORS,
   FINISHES,
@@ -28,6 +29,7 @@ import {
   ChevronsUpDownIcon,
 } from "lucide-react";
 import { BASE_PRICE } from "@/config/products";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -61,13 +63,90 @@ const DesignConfigurator = ({
     "blue-950": "border-blue-950",
     "rose-950": "border-rose-950",
   };
+
+  const [renderedDimension, setRenderedDimension] = useState({
+    width: imageDimensions.width / 4,
+    height: imageDimensions.height / 4,
+  });
+
+  const [renderedPosition, setRenderedPositsion] = useState({
+    x: 150,
+    y: 205,
+  });
+
+  const phoneCaseRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { startUpload } = useUploadThing("imageUploader");
+
+  async function saveConfiguration() {
+    //if (!phoneCaseRef.current) return
+    try {
+      const {
+        left: caseLeft,
+        top: caseTop,
+        width,
+        height,
+      } = phoneCaseRef.current!.getBoundingClientRect();
+      const { left: containerLeft, top: containerTop } =
+        containerRef.current!.getBoundingClientRect();
+      const leftOffset = caseLeft - containerLeft;
+      const topOffset = caseTop - containerTop;
+      const actualX = renderedPosition.x - leftOffset;
+      const actualY = renderedPosition.y - topOffset;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+
+      const userImage = new Image();
+      userImage.crossOrigin = "anonymous";
+      userImage.src = imageUrl;
+      await new Promise((resolve) => (userImage.onload = resolve));
+
+      ctx?.drawImage(
+        userImage,
+        actualX,
+        actualY,
+        renderedDimension.width,
+        renderedDimension.height
+      );
+
+      const base64 = canvas.toDataURL();
+      const base64Data = base64.split(",")[1];
+
+      const blob = base64ToBlob(base64Data, "image/png");
+      const file = new File([blob], "filename.png", { type: "image/png" });
+      await startUpload([file], { configId });
+    } catch (err) {
+      toast("Something went wrong", {
+        description: "There was an error on our end. Please try again.",
+      });
+    }
+  }
+
+  function base64ToBlob(base64: string, mimeType: string) {
+    const byteCharaters = atob(base64);
+    const byteNumbers = new Array(byteCharaters.length);
+    for (let i = 0; i < byteCharaters.length; i++) {
+      byteNumbers[i] = byteCharaters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  }
+
   return (
     <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20 pb-20">
       {/* Left column: phone preview (spans 2 cols on lg) */}
-      <div className="relative h-150 overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+      <div
+        ref={containerRef}
+        className="relative h-150 overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
         {/* allow pointer events on the container so the draggable area can receive events */}
         <div className="relative w-60 bg-opacity-50 aspect-896/1831">
           <AspectRatio
+            ref={phoneCaseRef}
             ratio={896 / 1831}
             className="relative z-50 aspect-896/1831 w-full"
           >
@@ -101,6 +180,17 @@ const DesignConfigurator = ({
               bottomLeft: <HandleComponent />,
               topRight: <HandleComponent />,
               topLeft: <HandleComponent />,
+            }}
+            onResizeStop={(_, __, ref, ___, { x, y }) => {
+              setRenderedDimension({
+                height: parseInt(ref.style.height.slice(0, -2)),
+                width: parseInt(ref.style.width.slice(0, -2)),
+              });
+              setRenderedPositsion({ x, y });
+            }}
+            onDragStop={(_, data) => {
+              const { x, y } = data;
+              setRenderedPositsion({ x, y });
             }}
           >
             <div className="relative w-full h-full">
@@ -278,7 +368,11 @@ const DesignConfigurator = ({
                 )}
               </p>
               <div className="bg-green-500 w-full flex flex-col items-center justify-center">
-                <Button>
+                <Button
+                  onClick={() => saveConfiguration()}
+                  className="w-full"
+                  size="sm"
+                >
                   Continue
                   <ArrowRight className="h-4 w-4 ml-1.5 inline" />
                 </Button>
