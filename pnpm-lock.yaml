@@ -74,6 +74,9 @@ importers:
       react-dom:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
+      react-dom-confetti:
+        specifier: ^0.2.0
+        version: 0.2.0(react@19.2.0)
       react-dropzone:
         specifier: ^14.3.8
         version: 14.3.8(react@19.2.0)
@@ -1607,6 +1610,9 @@ packages:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
 
+  dom-confetti@0.2.2:
+    resolution: {integrity: sha512-+UVH9Y85qmpTnbmFURwLWjqLIykyIrsNSRkPX/eFlBuOURz9RDX8JoZHnajZHyFuCV0w/K3+tZK0ztfoTw6ejg==}
+
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
@@ -2605,6 +2611,11 @@ packages:
     peerDependencies:
       react: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  react-dom-confetti@0.2.0:
+    resolution: {integrity: sha512-+XRTi+WlCrcRN2dTjdEopOaPFtS7hpaHRRQ0sHiVRGqpchKz4QVh3i+6eLEEpNHYpN2VgPmhjvJ/vnjmUYhlIQ==}
+    peerDependencies:
+      react: '*'
 
   react-dom@19.2.0:
     resolution: {integrity: sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ==}
@@ -4512,6 +4523,8 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
+  dom-confetti@0.2.2: {}
+
   dotenv@16.6.1: {}
 
   dotenv@17.2.3: {}
@@ -5640,6 +5653,11 @@ snapshots:
     dependencies:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
+
+  react-dom-confetti@0.2.0(react@19.2.0):
+    dependencies:
+      dom-confetti: 0.2.2
+      react: 19.2.0
 
   react-dom@19.2.0(react@19.2.0):
     dependencies:
