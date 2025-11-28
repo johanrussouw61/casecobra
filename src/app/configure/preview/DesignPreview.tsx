@@ -1,6 +1,10 @@
 "use client";
+import Phone from "@/app/components/Phone";
+import { cn } from "@/lib/utils";
+import { COLORS, MODELS } from "@/validators/option-validator";
 // lightweight in-place confetti generator (no external deps)
 import { Configuration } from "@prisma/client";
+import { Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 const confettiConfig = {
@@ -114,6 +118,15 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     return () => clearTimeout(t);
   }, []);
 
+  const { color, model } = configuration;
+  const tw = COLORS.find(
+    (supportedColor) => supportedColor.value === color
+  )?.tw;
+
+  const { label: modelLabel } = MODELS.options.find(
+    ({ value }) => value === model
+  )!;
+
   return (
     <>
       <div className="pointer-events-none select-none absolute inset-0 overflow-hidden flex justify-center items-start z-50">
@@ -123,6 +136,28 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
           className="w-full h-32 pointer-events-none flex justify-center"
         >
           {/* our lightweight confetti draws directly into the container */}
+        </div>
+        <div className="mt-20 flex flex-col items-center text-sm gap-6 w-full">
+          <div className="w-full flex justify-center">
+            <div className="w-full max-w-xs">
+              <Phone
+                className={cn(`bg-${tw}`)}
+                imgSrc={configuration.croppedImageUrl!}
+              />
+            </div>
+          </div>
+
+          <div className="text-center px-4">
+            <h3 className="text-3xl font-bold tracking-tight text-gray-900">
+              Your {modelLabel} Case
+            </h3>
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-base">
+              <Check className="h-5 w-5 text-green-500" />
+              <p className="text-gray-600">
+                Design successfully applied! and ready to ship
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -6,7 +6,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
 import { RadioGroup } from "@headlessui/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   COLORS,
@@ -89,9 +89,22 @@ const DesignConfigurator = ({
   });
 
   const [renderedPosition, setRenderedPositsion] = useState({
-    x: 150,
-    y: 205,
+    x: 0,
+    y: 0,
   });
+
+  // set sensible initial size/position based on the phone case element
+  useEffect(() => {
+    if (!phoneCaseRef.current) return;
+    const rect = phoneCaseRef.current.getBoundingClientRect();
+    const initialW = Math.round(rect.width * 0.6);
+    const initialH = Math.round(rect.height * 0.6);
+    setRenderedDimension({ width: initialW, height: initialH });
+    setRenderedPositsion({
+      x: Math.round((rect.width - initialW) / 2),
+      y: Math.round((rect.height - initialH) / 2),
+    });
+  }, []);
 
   const phoneCaseRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -247,18 +260,18 @@ const DesignConfigurator = ({
   }
 
   return (
-    <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20 pb-20">
+    <div className="relative mt-32 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20">
       {/* Left column: phone preview (spans 2 cols on lg) */}
       <div
         ref={containerRef}
-        className="relative h-150 overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="relative h-[37.5rem] overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
         {/* allow pointer events on the container so the draggable area can receive events */}
-        <div className="relative w-60 bg-opacity-50 aspect-896/1831">
+        <div className="relative w-60 bg-opacity-50 pointer-events-none aspect-[896/1831]">
           <AspectRatio
             ref={phoneCaseRef}
             ratio={896 / 1831}
-            className="relative z-50 aspect-896/1831 w-full"
+            className="pointer-events-none relative z-50 aspect-[896/1831] w-full"
           >
             <NextImage
               alt=""
@@ -268,22 +281,19 @@ const DesignConfigurator = ({
               className="pointer-events-none z-50 select-none"
             />
           </AspectRatio>
-          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)] pointer-events-none" />
+          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px] shadow-[0_0_0_99999px_rgba(229,231,235,0.6)] pointer-events-none" />
           <div
             className={cn(
-              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl pointer-events-none",
+              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px] pointer-events-none",
               TW_BG_MAP[options.color.tw]
             )}
           />
 
           <Rnd
-            default={{
-              x: 150,
-              y: 205,
-              height: imageDimensions.height / 4,
-              width: imageDimensions.width / 4,
-            }}
-            className="absolute z-60 border-[3px] border-primary pointer-events-auto"
+            bounds="parent"
+            position={renderedPosition}
+            size={renderedDimension}
+            className="absolute z-20 border-[3px] border-primary pointer-events-auto"
             lockAspectRatio
             resizeHandleComponent={{
               bottomRight: <HandleComponent />,
@@ -291,12 +301,21 @@ const DesignConfigurator = ({
               topRight: <HandleComponent />,
               topLeft: <HandleComponent />,
             }}
+            onResize={(e, __, ref) => {
+              setRenderedDimension({
+                height: parseInt(ref.style.height || "0", 10),
+                width: parseInt(ref.style.width || "0", 10),
+              });
+            }}
             onResizeStop={(_, __, ref, ___, { x, y }) => {
               setRenderedDimension({
-                height: parseInt(ref.style.height.slice(0, -2)),
-                width: parseInt(ref.style.width.slice(0, -2)),
+                height: parseInt(ref.style.height || "0", 10),
+                width: parseInt(ref.style.width || "0", 10),
               });
               setRenderedPositsion({ x, y });
+            }}
+            onDrag={(e, data) => {
+              setRenderedPositsion({ x: data.x, y: data.y });
             }}
             onDragStop={(_, data) => {
               const { x, y } = data;
@@ -316,11 +335,11 @@ const DesignConfigurator = ({
       </div>
 
       {/* Right column: Scroll area */}
-      <div className="h-150 w-full col-span-full lg:col-span-1 flex flex-col bg-white">
+      <div className="h-[37.5rem] w-full col-span-full lg:col-span-1 flex flex-col bg-white">
         <ScrollArea className="relative flex-1 overflow-auto">
           <div
             aria-hidden="true"
-            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-linear-to-t  from-white pointer-events-none"
+            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white pointer-events-none"
           />
           <div className="px-8 pb-12 pt-8">
             <h2 className="tracking-tight font-bold text-3xl text-black">
@@ -471,7 +490,7 @@ const DesignConfigurator = ({
           <div className="h-px w-full bg-zinc-200" />
           <div className="w-full h-full flex justify-end items-center">
             <div className="w-full flex gap-6 items-center">
-              <p className="font-medium whitespace-nowrap-">
+              <p className="font-medium whitespace-nowrap">
                 {formatPrice(
                   (BASE_PRICE + options.finish.price + options.material.price) /
                     100
