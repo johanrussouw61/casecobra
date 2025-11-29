@@ -33,6 +33,7 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { useMutation } from "@tanstack/react-query";
 import { SafeConfigArgs, saveConfig as _saveConfig } from "./actions";
 import { useRouter } from "next/navigation";
+import ScrollableArea from "@/app/components/ScrollableArea";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -264,14 +265,14 @@ const DesignConfigurator = ({
       {/* Left column: phone preview (spans 2 cols on lg) */}
       <div
         ref={containerRef}
-        className="relative h-[37.5rem] overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="relative h-150 overflow-hidden col-span-full lg:col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
         {/* allow pointer events on the container so the draggable area can receive events */}
-        <div className="relative w-60 bg-opacity-50 pointer-events-none aspect-[896/1831]">
+        <div className="relative w-60 bg-opacity-50 pointer-events-none aspect-896/1831">
           <AspectRatio
             ref={phoneCaseRef}
             ratio={896 / 1831}
-            className="pointer-events-none relative z-50 aspect-[896/1831] w-full"
+            className="pointer-events-none relative z-50 aspect-896/1831 w-full"
           >
             <NextImage
               alt=""
@@ -281,10 +282,10 @@ const DesignConfigurator = ({
               className="pointer-events-none z-50 select-none"
             />
           </AspectRatio>
-          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px] shadow-[0_0_0_99999px_rgba(229,231,235,0.6)] pointer-events-none" />
+          <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl shadow-[0_0_0_99999px_rgba(229,231,235,0.6)] pointer-events-none" />
           <div
             className={cn(
-              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px] pointer-events-none",
+              "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-4xl pointer-events-none",
               TW_BG_MAP[options.color.tw]
             )}
           />
@@ -335,11 +336,11 @@ const DesignConfigurator = ({
       </div>
 
       {/* Right column: Scroll area */}
-      <div className="h-[37.5rem] w-full col-span-full lg:col-span-1 flex flex-col bg-white">
+      <div className="h-150 w-full col-span-full lg:col-span-1 flex flex-col bg-white">
         <ScrollArea className="relative flex-1 overflow-auto">
           <div
             aria-hidden="true"
-            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white pointer-events-none"
+            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-linear-to-t from-white pointer-events-none"
           />
           <div className="px-8 pb-12 pt-8">
             <h2 className="tracking-tight font-bold text-3xl text-black">

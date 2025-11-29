@@ -1,5 +1,6 @@
 "use client";
 import Phone from "@/app/components/Phone";
+import ScrollableArea from "@/app/components/ScrollableArea";
 import { cn } from "@/lib/utils";
 import { COLORS, MODELS } from "@/validators/option-validator";
 // lightweight in-place confetti generator (no external deps)
@@ -128,39 +129,26 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   )!;
 
   return (
-    <>
-      <div className="pointer-events-none select-none absolute inset-0 overflow-hidden flex justify-center items-start z-50">
-        {/* give the confetti container a visible horizontal area so dom-confetti can position particles */}
-        <div
-          ref={confettiRef}
-          className="w-full h-32 pointer-events-none flex justify-center"
-        >
-          {/* our lightweight confetti draws directly into the container */}
-        </div>
-        <div className="mt-20 flex flex-col items-center text-sm gap-6 w-full">
-          <div className="w-full flex justify-center">
-            <div className="w-full max-w-xs">
-              <Phone
-                className={cn(`bg-${tw}`)}
-                imgSrc={configuration.croppedImageUrl!}
-              />
-            </div>
-          </div>
-
-          <div className="text-center px-4">
-            <h3 className="text-3xl font-bold tracking-tight text-gray-900">
-              Your {modelLabel} Case
-            </h3>
-            <div className="mt-3 flex items-center justify-center gap-1.5 text-base">
-              <Check className="h-5 w-5 text-green-500" />
-              <p className="text-gray-600">
-                Design successfully applied! and ready to ship
-              </p>
-            </div>
-          </div>
-        </div>
+    <ScrollableArea height="700px">
+      <div className="text-center px-4 flex flex-col items-center justify-center ">
+        <Phone
+          className={cn(`bg-${tw}`)}
+          imgSrc={configuration.croppedImageUrl!}
+        />
+        <h3 className="text-3xl font-bold tracking-tight text-gray-900">
+          Your {modelLabel} Case
+        </h3>
+        <Check className="h-5 w-5 text-green-500" />
+        <p className="text-gray-600">In stock and ready to ship</p>
+        <p className="font-medium text-zinc-950">Highlights</p>
+        <ol className="mt-3 text-zinc-700 list-disc list-inside">
+          <li>Wireless charging compatible</li>
+          <li>TPU schock absorption</li>
+          <li>Packaging made from recycled materials</li>
+          <li>5 year print warranty</li>
+        </ol>
       </div>
-    </>
+    </ScrollableArea>
   );
 };
 
