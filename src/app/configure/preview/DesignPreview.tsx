@@ -1,11 +1,12 @@
 "use client";
 import Phone from "@/app/components/Phone";
 import ScrollableArea from "@/app/components/ScrollableArea";
+import { Button } from "@/components/ui/button";
 import { BASE_PRICE, PRODUCT_PRICES } from "@/config/products";
 import { cn, formatPrice } from "@/lib/utils";
 import { COLORS, MODELS } from "@/validators/option-validator";
 import { Configuration } from "@prisma/client";
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 const confettiConfig = {
   elementCount: 80,
@@ -219,6 +220,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                       </p>
                     </div>
                   </div>
+                </div>
+                <div className="mt-8 flex justify-end pb-12">
+                  <Button className="px-4 sm:px-6.lg:px-8 bg-green-600">
+                    Check out <ArrowRight className="h-4 w-4 ml-1.5 inline" />
+                  </Button>
                 </div>
               </div>
             </div>
