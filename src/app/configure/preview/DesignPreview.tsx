@@ -6,6 +6,7 @@ import { BASE_PRICE, PRODUCT_PRICES } from "@/config/products";
 import { cn, formatPrice } from "@/lib/utils";
 import { COLORS, MODELS } from "@/validators/option-validator";
 import { Configuration } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 const confettiConfig = {
@@ -96,6 +97,11 @@ function spawnConfetti(container: HTMLElement, opts: typeof confettiConfig) {
       canvas.remove();
     }
   }
+
+  const { } = useMutation({
+  mutationKey: ["get-checkout-sessio"],
+  mutationFn: 
+})  
 
   requestAnimationFrame(frame);
   requestAnimationFrame(frame);
@@ -222,7 +228,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                   </div>
                 </div>
                 <div className="mt-8 flex justify-end pb-12">
-                  <Button className="px-4 sm:px-6.lg:px-8 bg-green-600">
+                  <Button
+                    isLoading={true}
+                    loadingText="loading"
+                    className="px-4 sm:px-6.lg:px-8 bg-green-600"
+                  >
                     Check out <ArrowRight className="h-4 w-4 ml-1.5 inline" />
                   </Button>
                 </div>
