@@ -128,6 +128,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     ({ value }) => value === model
   )!;
 
+  let totalPrice = BASE_PRICE;
+  if (material === "polycarbonate")
+    totalPrice += PRODUCT_PRICES.material.polycarbonate;
+  if (finish == "textured") totalPrice += PRODUCT_PRICES.finish.textured;
+
   return (
     <>
       <ScrollableArea height="700px">
@@ -197,7 +202,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                     {material === "polycarbonate" ? (
                       <div className="flex items-center justify-between py-1 mt-2">
                         <p className="text-gray-600">
-                          Soft polycarbonate material
+                          Soft plycarbonate material{" "}
                         </p>
                         <p className="font-medium text-gray-900">
                           {formatPrice(
@@ -206,6 +211,13 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                         </p>
                       </div>
                     ) : null}
+
+                    <div className="flex items-center justify-between py-1 mt-2">
+                      <p className="text-gray-600">Total Price</p>
+                      <p className="font-medium text-gray-900">
+                        {formatPrice(totalPrice / 100)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
