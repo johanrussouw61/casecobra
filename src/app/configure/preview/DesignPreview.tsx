@@ -9,6 +9,7 @@ import { Configuration } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { createCheckoutSession } from "./actions";
 const confettiConfig = {
   elementCount: 80,
   duration: 3000,
@@ -98,11 +99,6 @@ function spawnConfetti(container: HTMLElement, opts: typeof confettiConfig) {
     }
   }
 
-  const { } = useMutation({
-  mutationKey: ["get-checkout-sessio"],
-  mutationFn: 
-})  
-
   requestAnimationFrame(frame);
   requestAnimationFrame(frame);
 }
@@ -140,6 +136,10 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     totalPrice += PRODUCT_PRICES.material.polycarbonate;
   if (finish == "textured") totalPrice += PRODUCT_PRICES.finish.textured;
 
+  const {} = useMutation({
+    mutationKey: ["get-checkout-session"],
+    mutationFn: createCheckoutSession,
+  });
   return (
     <>
       <ScrollableArea height="700px">
