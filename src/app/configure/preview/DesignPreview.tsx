@@ -1,7 +1,8 @@
 "use client";
 import Phone from "@/app/components/Phone";
 import ScrollableArea from "@/app/components/ScrollableArea";
-import { cn } from "@/lib/utils";
+import { BASE_PRICE, PRODUCT_PRICES } from "@/config/products";
+import { cn, formatPrice } from "@/lib/utils";
 import { COLORS, MODELS } from "@/validators/option-validator";
 import { Configuration } from "@prisma/client";
 import { Check } from "lucide-react";
@@ -100,11 +101,13 @@ function spawnConfetti(container: HTMLElement, opts: typeof confettiConfig) {
 }
 
 const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showConfetti, setShowConfetti] = useState(false);
   //useEffect(() => setShowConfetti(true));
   const confettiRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     // trigger once on mount
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowConfetti(true);
     const t = setTimeout(
       () => setShowConfetti(false),
@@ -116,7 +119,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
     return () => clearTimeout(t);
   }, []);
-  const { color, model } = configuration;
+  const { color, model, finish, material } = configuration;
   const tw = COLORS.find(
     (supportedColor) => supportedColor.value === color
   )?.tw;
@@ -172,6 +175,39 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                   <li>High-quality, durable material</li>
                   <li>Scratch- and fingerprint resistant coating</li>
                 </ol>
+              </div>
+
+              <div className="mt-8">
+                <div className="bg-gray50 p-6">
+                  <div className="flow-root text-sm">
+                    <div className="flex items-center justify-between py-1 mt-2">
+                      <p className="text-gray-600">Base Price</p>
+                      <p className="font-medium text-gray-900">
+                        {formatPrice(BASE_PRICE / 100)}
+                      </p>
+                    </div>
+                    {finish === "textured" ? (
+                      <div className="flex items-center justify-between py-1 mt-2">
+                        <p className="text-gray-600">Textured finish</p>
+                        <p className="font-medium text-gray-900">
+                          {formatPrice(PRODUCT_PRICES.finish.textured / 100)}
+                        </p>
+                      </div>
+                    ) : null}
+                    {material === "polycarbonate" ? (
+                      <div className="flex items-center justify-between py-1 mt-2">
+                        <p className="text-gray-600">
+                          Soft polycarbonate material
+                        </p>
+                        <p className="font-medium text-gray-900">
+                          {formatPrice(
+                            PRODUCT_PRICES.material.polycarbonate / 100
+                          )}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
