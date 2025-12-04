@@ -9,7 +9,9 @@ import { Configuration } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { toast } from "sonner";
 import { createCheckoutSession } from "./actions";
+import { useRouter } from "next/navigation";
 const confettiConfig = {
   elementCount: 80,
   duration: 3000,
@@ -108,6 +110,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   const [showConfetti, setShowConfetti] = useState(false);
   //useEffect(() => setShowConfetti(true));
   const confettiRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
   useEffect(() => {
     // trigger once on mount
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -136,10 +139,23 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     totalPrice += PRODUCT_PRICES.material.polycarbonate;
   if (finish == "textured") totalPrice += PRODUCT_PRICES.finish.textured;
 
-  const {} = useMutation({
+  const { mutate: createPaymentSession } = useMutation({
     mutationKey: ["get-checkout-session"],
     mutationFn: createCheckoutSession,
+    onSuccess: ({ url }) => {
+      if (url) {
+        router.push(url);
+      } else {
+        throw new Error("Unable to retrieve payment URL");
+      }
+    },
+    onError: () => {
+      toast("Something went wrong", {
+        description: "There was an error on our end. Please try again.",
+      });
+    },
   });
+
   return (
     <>
       <ScrollableArea height="700px">
@@ -229,7 +245,9 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                 </div>
                 <div className="mt-8 flex justify-end pb-12">
                   <Button
-                    isLoading={true}
+                    onClick={() =>
+                      createPaymentSession({ configId: configuration.id })
+                    }
                     loadingText="loading"
                     className="px-4 sm:px-6.lg:px-8 bg-green-600"
                   >
