@@ -12,6 +12,9 @@ import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { createCheckoutSession } from "./actions";
 import { useRouter } from "next/navigation";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import LoginModal from "@/app/components/LoginModal";
+
 const confettiConfig = {
   elementCount: 80,
   duration: 3000,
@@ -111,6 +114,10 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   //useEffect(() => setShowConfetti(true));
   const confettiRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const { id } = configuration;
+  const { user } = useKindeBrowserClient();
+  const [isLoginModalOpen, SetIsLoginModalOpen] = useState(false);
+
   useEffect(() => {
     // trigger once on mount
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -125,6 +132,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
     return () => clearTimeout(t);
   }, []);
+
   const { color, model, finish, material } = configuration;
   const tw = COLORS.find(
     (supportedColor) => supportedColor.value === color
@@ -156,6 +164,19 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     },
   });
 
+  const handleCheckout = () => {
+    if (user) {
+      //create payment session
+      createPaymentSession({ configId: id });
+    } else {
+      {
+        // need login
+        localStorage.setItem("configurationId", id);
+        SetIsLoginModalOpen(true);
+      }
+    }
+  };
+
   return (
     <>
       <ScrollableArea height="700px">
@@ -168,6 +189,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
             className="w-full h-32 pointer-events-none flex justify-center"
           />
         </div>
+        <LoginModal isOpen={isLoginModalOpen} setIsOpen={SetIsLoginModalOpen} />
         <div className="px-4 w-full">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             <div className="md:col-span-5 lg:col-span-4 flex justify-center">
@@ -245,9 +267,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
                 </div>
                 <div className="mt-8 flex justify-end pb-12">
                   <Button
-                    onClick={() =>
-                      createPaymentSession({ configId: configuration.id })
-                    }
+                    onClick={() => handleCheckout()}
                     loadingText="loading"
                     className="px-4 sm:px-6.lg:px-8 bg-green-600"
                   >

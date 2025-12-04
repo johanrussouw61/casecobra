@@ -26,7 +26,7 @@ export const createCheckoutSession = async ({
     throw new Error("You need to be logged in");
   }
 
-  console.log(kindleUser);
+  //console.log(kindleUser);
 
   const dbuser = await db.user.findFirst({
     where: { id: kindleUser.id },
@@ -71,7 +71,7 @@ export const createCheckoutSession = async ({
     },
   });
 
-  console.log(user!.id, configuration.id);
+  //console.log(user.id, configuration.id);
 
   if (existingOrder) {
     order = existingOrder;
@@ -108,7 +108,8 @@ export const createCheckoutSession = async ({
     },
     line_items: [{ price: product.default_price as string, quantity: 1 }],
   });
-console.log("stripe url: ", stripeSession.url);
+
+  //console.log("stripe url: ", stripeSession.url);
 
   return { url: stripeSession.url };
 };
