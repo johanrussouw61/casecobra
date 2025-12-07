@@ -27,7 +27,7 @@ const Page = () => {
     retryDelay: 1000,
   });
 
-  console.log("data from getAuthStatus: ", data);
+  //console.log("data from getAuthStatus: ", data);
 
   useEffect(() => {
     if (data?.success) {
