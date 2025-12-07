@@ -1,15 +1,14 @@
-import { db } from "@/app/db";
 import { notFound } from "next/navigation";
 import DesignPreview from "./DesignPreview";
+import { db } from "@/app/db";
 
-interface PreviewPageProps {
-  searchParams: {
-    [key: string]: string | string[] | undefined;
-  };
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-const Page = async ({ searchParams }: PreviewPageProps) => {
+const Page = async ({ searchParams }: PageProps) => {
   const { id } = await searchParams;
+
   if (!id || typeof id !== "string") {
     return notFound();
   }

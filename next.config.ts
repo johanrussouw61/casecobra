@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+      hmrRefreshes: true, // Also log fetches that are restored from the HMR cache
+    },
+    // You can also manage incoming requests logging
+    incomingRequests: true,
+  },
 };
 
 export default nextConfig;
