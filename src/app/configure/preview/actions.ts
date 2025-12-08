@@ -20,39 +20,10 @@ export const createCheckoutSession = async ({
   }
 
   const { getUser } = getKindeServerSession();
-  const kindleUser = await getUser();
-
-  if (!kindleUser) {
-    throw new Error("You need to be logged in");
-  }
-
-  //console.log(kindleUser);
-
-  const dbuser = await db.user.findFirst({
-    where: { id: kindleUser.id },
-  });
-
-  if (!dbuser) {
-    await db.user.create({
-      data: {
-        email: kindleUser.email!,
-      },
-    });
-    const newdbuser = await db.user.findFirst({
-      where: { email: kindleUser.email! },
-    });
-
-    if (!newdbuser) {
-      throw new Error("You need to be logged in");
-    }
-  }
-
-  const user = await db.user.findFirst({
-    where: { email: kindleUser.email! },
-  });
+  const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged in or your not in our db");
+    throw new Error("You need to be logged in");
   }
 
   const { finish, material } = configuration;
@@ -71,7 +42,7 @@ export const createCheckoutSession = async ({
     },
   });
 
-  //console.log(user.id, configuration.id);
+  console.log(user.id, configuration.id);
 
   if (existingOrder) {
     order = existingOrder;
@@ -108,8 +79,6 @@ export const createCheckoutSession = async ({
     },
     line_items: [{ price: product.default_price as string, quantity: 1 }],
   });
-
-  //console.log("stripe url: ", stripeSession.url);
 
   return { url: stripeSession.url };
 };
