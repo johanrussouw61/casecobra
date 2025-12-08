@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 now ongithub johanrussouw61/casecobra
 
-now on vercel https://casecobra-psi.vercel.app/
+Vercel url https://casecobra-peach.vercel.app/
 
 First, run the development server:
 
