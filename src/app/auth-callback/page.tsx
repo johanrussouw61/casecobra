@@ -16,6 +16,7 @@ const Page = () => {
       return null;
     }
   };
+
   const configurationId = getConfigId();
 
   const router = useRouter();
@@ -30,7 +31,7 @@ const Page = () => {
   //console.log("data from getAuthStatus: ", data);
 
   useEffect(() => {
-    if (data?.success) {
+    if (data?.success === true && configurationId) {
       localStorage.removeItem("configurationId");
       router.push(`/configure/preview?id=${configurationId}`);
     } else if (data?.success === false) {
