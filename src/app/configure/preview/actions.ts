@@ -6,9 +6,30 @@ import { stripe } from "@/lib/stripe";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Order } from "@prisma/client";
 
-export const getCurrentUser = async () => {
+export const checkUserInDb = async () => {
   const { getUser } = getKindeServerSession();
-  return await getUser();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("You need to be logged in");
+  }
+
+  const dbuser = await db.user.findFirst({
+    where: { id: user.id },
+  });
+
+  if (!user.email) {
+    throw new Error("Kinde user have no email");
+  }
+
+  if (!dbuser) {
+    await db.user.create({
+      data: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  }
 };
 
 export const createCheckoutSession = async ({
@@ -47,6 +68,7 @@ export const createCheckoutSession = async ({
       },
     });
   }
+
   const { finish, material } = configuration;
 
   let price = BASE_PRICE;

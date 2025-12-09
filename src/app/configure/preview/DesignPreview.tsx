@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { createCheckoutSession } from "./actions";
+import { checkUserInDb, createCheckoutSession } from "./actions";
 import { useRouter } from "next/navigation";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import LoginModal from "@/app/components/LoginModal";
@@ -165,9 +165,21 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     },
   });
 
+  const { mutate: checkUserInDataBase } = useMutation({
+    mutationKey: ["checkUser"],
+    mutationFn: checkUserInDb,
+
+    onError: () => {
+      toast("Cannot find user or add it to DB", {
+        description: "Cannot find user or add it to DB, Please try again.",
+      });
+    },
+  });
+
   const handleCheckout = () => {
     if (user) {
       //create payment session
+      checkUserInDataBase();
       createPaymentSession({ configId: id });
     } else {
       {
