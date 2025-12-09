@@ -115,10 +115,9 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   const confettiRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const { id } = configuration;
-  const { getUser } = useKindeBrowserClient();
+  const { user } = useKindeBrowserClient();
   const [isLoginModalOpen, SetIsLoginModalOpen] = useState(false);
 
-  const user = getUser();
   console.log("user inside design preview: ", user);
 
   useEffect(() => {
