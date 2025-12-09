@@ -14,18 +14,17 @@ export const checkUserInDb = async () => {
     throw new Error("You need to be logged in");
   }
 
-  const dbuser = await db.user.findFirst({
-    where: { id: user.id },
-  });
-
   if (!user.email) {
     throw new Error("Kinde user have no email");
   }
 
+  const dbuser = await db.user.findFirst({
+    where: { email: user.email },
+  });
+
   if (!dbuser) {
     await db.user.create({
       data: {
-        id: user.id,
         email: user.email,
       },
     });
@@ -52,21 +51,16 @@ export const createCheckoutSession = async ({
     throw new Error("You need to be logged in");
   }
 
-  const dbuser = await db.user.findFirst({
-    where: { id: user.id },
-  });
-
   if (!user.email) {
     throw new Error("Kinde user have no email");
   }
 
+  const dbuser = await db.user.findFirst({
+    where: { email: user.email },
+  });
+
   if (!dbuser) {
-    await db.user.create({
-      data: {
-        id: user.id,
-        email: user.email,
-      },
-    });
+    throw new Error("User is not in DB");
   }
 
   const { finish, material } = configuration;
@@ -80,7 +74,7 @@ export const createCheckoutSession = async ({
 
   const existingOrder = await db.order.findFirst({
     where: {
-      userId: user.id,
+      userId: dbuser.id,
       configurationId: configuration.id,
     },
   });
@@ -93,7 +87,7 @@ export const createCheckoutSession = async ({
     order = await db.order.create({
       data: {
         amount: price / 100,
-        userId: user.id,
+        userId: dbuser.id,
         configurationId: configuration.id,
       },
     });
@@ -117,7 +111,7 @@ export const createCheckoutSession = async ({
     mode: "payment",
     shipping_address_collection: { allowed_countries: ["DE", "US"] },
     metadata: {
-      userId: user.id,
+      userId: dbuser.id,
       orderId: order!.id,
     },
     line_items: [{ price: product.default_price as string, quantity: 1 }],
