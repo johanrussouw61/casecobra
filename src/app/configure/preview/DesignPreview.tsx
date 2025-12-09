@@ -166,7 +166,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   });
 
   const handleCheckout = () => {
-    if (user?.email !== "" || user !== null) {
+    if (user) {
       //create payment session
       createPaymentSession({ configId: id });
     } else {
