@@ -12,8 +12,7 @@ export async function POST(req: Request) {
     const result = await createCheckoutSession({ configId });
     return NextResponse.json(result);
   } catch (error) {
-    return new NextResponse(`Error creating session ${error}  `, {
-      status: 400,
-    });
+    const message = error?.message ?? String(error ?? "Unknown error");
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

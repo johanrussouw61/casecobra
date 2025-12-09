@@ -155,8 +155,14 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         body: JSON.stringify({ configId }),
       });
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Checkout failed");
+        // try to parse structured JSON error first
+        try {
+          const j = await res.json();
+          throw new Error(j?.error ?? JSON.stringify(j));
+        } catch (e) {
+          const text = await res.text();
+          throw new Error(text || "Checkout failed");
+        }
       }
       return res.json();
     },
@@ -167,10 +173,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         throw new Error("Unable to retrieve payment URL");
       }
     },
-    onError: () => {
+    onError: (err: any) => {
+      const message = err?.message ?? String(err);
+      console.error("checkout error:", err);
       toast("Something went wrong", {
-        description:
-          "There was an error in createPaymentSession Please try again.",
+        description: message || "There was an error in createPaymentSession",
       });
     },
   });
@@ -182,15 +189,22 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         method: "POST",
       });
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Check user failed");
+        try {
+          const j = await res.json();
+          throw new Error(j?.error ?? JSON.stringify(j));
+        } catch (e) {
+          const text = await res.text();
+          throw new Error(text || "Check user failed");
+        }
       }
       return res.json();
     },
-
-    onError: () => {
+    onError: (err: any) => {
+      const message = err?.message ?? String(err);
+      console.error("check-user error:", err);
       toast("Cannot find user or add it to DB", {
-        description: "Cannot find user or add it to DB, Please try again.",
+        description:
+          message || "Cannot find user or add it to DB, Please try again.",
       });
     },
   });
