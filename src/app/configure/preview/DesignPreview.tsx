@@ -189,7 +189,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
             className="w-full h-32 pointer-events-none flex justify-center"
           />
         </div>
-        <h1 className="text-3xl bg-white text-black">{user.email}</h1>
+        <h1 className="text-3xl bg-white text-black">{user?.email}</h1>
         <LoginModal isOpen={isLoginModalOpen} setIsOpen={SetIsLoginModalOpen} />
         <div className="px-4 w-full">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
