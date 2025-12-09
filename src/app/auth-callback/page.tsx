@@ -18,8 +18,11 @@ const Page = () => {
   };
 
   const configurationId = getConfigId();
-
   const router = useRouter();
+
+  if (!configurationId) {
+    router.push("/");
+  }
 
   const { data } = useQuery({
     queryKey: ["auth-callback"],
