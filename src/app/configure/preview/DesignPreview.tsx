@@ -10,9 +10,9 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { createCheckoutSession } from "./actions";
+import { createCheckoutSession, getCurrentUser } from "./actions";
 import { useRouter } from "next/navigation";
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+//import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import LoginModal from "@/app/components/LoginModal";
 
 const confettiConfig = {
@@ -115,10 +115,25 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
   const confettiRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const { id } = configuration;
-  const { user } = useKindeBrowserClient();
+  const [user, setUser] = useState<Awaited<
+    ReturnType<typeof getCurrentUser>
+  > | null>(null);
   const [isLoginModalOpen, SetIsLoginModalOpen] = useState(false);
 
-  console.log("user inside design preview: ", user);
+  useEffect(() => {
+    // Fetch current user
+    const fetchUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        console.log("in preview current user", currentUser);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     // trigger once on mount
