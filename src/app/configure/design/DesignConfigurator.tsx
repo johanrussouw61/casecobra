@@ -33,7 +33,6 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { useMutation } from "@tanstack/react-query";
 import { SafeConfigArgs, saveConfig as _saveConfig } from "./actions";
 import { useRouter } from "next/navigation";
-import ScrollableArea from "@/app/components/ScrollableArea";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -53,7 +52,7 @@ const DesignConfigurator = ({
       await Promise.all([saveConfiguration(), _saveConfig(args)]);
     },
     onError: () => {
-      toast("Something went wrong", {
+      toast("Something went wrong saving your config", {
         description: "There was an error on our end. Please try again.",
       });
     },
@@ -184,27 +183,6 @@ const DesignConfigurator = ({
         Math.min(dh - srcDisplayY, caseHeight - Math.max(0, dy))
       );
 
-      // debug log to browser console for diagnosis
-      // eslint-disable-next-line no-console
-      console.debug("saveConfiguration debug", {
-        caseLeft,
-        caseTop,
-        caseWidth,
-        caseHeight,
-        renderedPosition,
-        renderedDimension,
-        dx,
-        dy,
-        dw,
-        dh,
-        imgNaturalW,
-        imgNaturalH,
-        srcDisplayX,
-        srcDisplayY,
-        srcDisplayW,
-        srcDisplayH,
-      });
-
       // clear canvas first
       ctx.clearRect(0, 0, caseWidth, caseHeight);
 
@@ -242,7 +220,6 @@ const DesignConfigurator = ({
       const file = new File([blob], "filename.png", { type: "image/png" });
       await startUpload([file], { configId });
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("saveConfiguration error", err);
       toast("Something went wrong", {
         description: "There was an error on our end. Please try again.",

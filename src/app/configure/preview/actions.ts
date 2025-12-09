@@ -31,6 +31,22 @@ export const createCheckoutSession = async ({
     throw new Error("You need to be logged in");
   }
 
+  const dbuser = await db.user.findFirst({
+    where: { id: user.id },
+  });
+
+  if (!user.email) {
+    throw new Error("Kinde user have no email");
+  }
+
+  if (!dbuser) {
+    await db.user.create({
+      data: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  }
   const { finish, material } = configuration;
 
   let price = BASE_PRICE;
@@ -47,7 +63,7 @@ export const createCheckoutSession = async ({
     },
   });
 
-  console.log(user.id, configuration.id);
+  //console.log(user.id, configuration.id);
 
   if (existingOrder) {
     order = existingOrder;

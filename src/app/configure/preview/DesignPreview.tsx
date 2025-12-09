@@ -159,7 +159,8 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     },
     onError: () => {
       toast("Something went wrong", {
-        description: "There was an error on our end. Please try again.",
+        description:
+          "There was an error in createPaymentSession Please try again.",
       });
     },
   });
@@ -189,9 +190,9 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
             className="w-full h-32 pointer-events-none flex justify-center"
           />
         </div>
-        <h1 className="text-3xl bg-white text-black">
+        <h3 className="text-2xl bg-white text-black">
           User Email {user?.email}
-        </h1>
+        </h3>
         <LoginModal isOpen={isLoginModalOpen} setIsOpen={SetIsLoginModalOpen} />
         <div className="px-4 w-full">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
