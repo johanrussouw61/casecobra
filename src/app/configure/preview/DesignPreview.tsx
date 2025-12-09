@@ -10,7 +10,6 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { checkUserInDb, createCheckoutSession } from "./actions";
 import { useRouter } from "next/navigation";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import LoginModal from "@/app/components/LoginModal";
@@ -149,7 +148,18 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
   const { mutate: createPaymentSession } = useMutation({
     mutationKey: ["get-checkout-session"],
-    mutationFn: createCheckoutSession,
+    mutationFn: async ({ configId }: { configId: string }) => {
+      const res = await fetch("/api/preview/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ configId }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Checkout failed");
+      }
+      return res.json();
+    },
     onSuccess: ({ url }) => {
       if (url) {
         router.push(url);
@@ -167,7 +177,16 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
   const { mutate: checkUserInDataBase } = useMutation({
     mutationKey: ["checkUser"],
-    mutationFn: checkUserInDb,
+    mutationFn: async () => {
+      const res = await fetch("/api/preview/check-user", {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Check user failed");
+      }
+      return res.json();
+    },
 
     onError: () => {
       toast("Cannot find user or add it to DB", {
