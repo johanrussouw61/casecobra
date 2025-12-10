@@ -3,31 +3,21 @@
 import { db } from "@/app/db";
 import { BASE_PRICE, PRODUCT_PRICES } from "@/config/products";
 import { stripe } from "@/lib/stripe";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Order } from "@prisma/client";
 
-export const checkUserInDb = async () => {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-
-  console.log("checkUserInDb - user:", user);
-
-  if (!user) {
-    throw new Error("You need to be logged in");
-  }
-
-  if (!user.email) {
+export const checkUserInDb = async (userEmail: string) => {
+  if (!userEmail) {
     throw new Error("User email not found");
   }
 
   const dbuser = await db.user.findFirst({
-    where: { email: user.email },
+    where: { email: userEmail },
   });
 
   if (!dbuser) {
     await db.user.create({
       data: {
-        email: user.email,
+        email: userEmail,
       },
     });
   }
@@ -35,8 +25,10 @@ export const checkUserInDb = async () => {
 
 export const createCheckoutSession = async ({
   configId,
+  userEmail,
 }: {
   configId: string;
+  userEmail: string;
 }) => {
   const configuration = await db.configuration.findUnique({
     where: { id: configId },
@@ -46,25 +38,18 @@ export const createCheckoutSession = async ({
     throw new Error("No such configuration found");
   }
 
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-
-  if (!user) {
-    throw new Error("You need to be logged in");
-  }
-
-  if (!user.email) {
+  if (!userEmail) {
     throw new Error("User email not found");
   }
 
   let dbuser = await db.user.findFirst({
-    where: { email: user.email },
+    where: { email: userEmail },
   });
 
   if (!dbuser) {
     dbuser = await db.user.create({
       data: {
-        email: user.email,
+        email: userEmail,
       },
     });
   }
