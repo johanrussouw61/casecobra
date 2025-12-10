@@ -119,7 +119,6 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
   useEffect(() => {
     // trigger once on mount
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowConfetti(true);
     const t = setTimeout(
       () => setShowConfetti(false),
@@ -159,7 +158,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         try {
           const j = await res.json();
           throw new Error(j?.error ?? JSON.stringify(j));
-        } catch (e) {
+        } catch {
           const text = await res.text();
           throw new Error(text || "Checkout failed");
         }
@@ -173,7 +172,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         throw new Error("Unable to retrieve payment URL");
       }
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       const message = err?.message ?? String(err);
       console.error("checkout error:", err);
       toast("Something went wrong", {
@@ -192,14 +191,14 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         try {
           const j = await res.json();
           throw new Error(j?.error ?? JSON.stringify(j));
-        } catch (e) {
+        } catch {
           const text = await res.text();
           throw new Error(text || "Check user failed");
         }
       }
       return res.json();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       const message = err?.message ?? String(err);
       console.error("check-user error:", err);
       toast("Cannot find user or add it to DB", {

@@ -6,7 +6,8 @@ export async function POST() {
     await checkUserInDb();
     return NextResponse.json({ ok: true });
   } catch (err) {
-    const message = (err as any)?.message ?? String(err ?? "Unknown error");
+    const message =
+      err instanceof Error ? err.message : String(err ?? "Unknown error");
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
