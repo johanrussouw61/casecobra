@@ -11,7 +11,7 @@ export const checkUserInDb = async () => {
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged  checkUseInDB");
+    throw new Error("You need to be logged in heckUserInDb ");
   }
 
   if (!user.email) {
