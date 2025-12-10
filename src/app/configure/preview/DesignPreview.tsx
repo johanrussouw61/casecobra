@@ -154,12 +154,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         body: JSON.stringify({ configId }),
       });
       if (!res.ok) {
-        // try to parse structured JSON error first
+        const text = await res.text();
         try {
-          const j = await res.json();
+          const j = JSON.parse(text);
           throw new Error(j?.error ?? JSON.stringify(j));
         } catch {
-          const text = await res.text();
           throw new Error(text || "Checkout failed");
         }
       }
@@ -188,11 +187,11 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
         method: "POST",
       });
       if (!res.ok) {
+        const text = await res.text();
         try {
-          const j = await res.json();
+          const j = JSON.parse(text);
           throw new Error(j?.error ?? JSON.stringify(j));
         } catch {
-          const text = await res.text();
           throw new Error(text || "Check user failed");
         }
       }
