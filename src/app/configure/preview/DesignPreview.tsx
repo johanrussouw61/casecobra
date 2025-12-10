@@ -182,13 +182,9 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
 
   const checkUserInDataBase = async () => {
     try {
-      const response = await fetch("/api/user/check", {
+      const response = await fetch("/api/preview/check-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user?.id,
-          email: user?.email,
-        }),
       });
 
       if (!response.ok) {
