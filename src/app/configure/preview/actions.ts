@@ -11,7 +11,7 @@ export const checkUserInDb = async () => {
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged in");
+    throw new Error("You need to be logged  checkUseInDB");
   }
 
   if (!user.email) {
@@ -48,7 +48,7 @@ export const createCheckoutSession = async ({
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged in");
+    throw new Error("You need to be logged in createCheckoutSession");
   }
 
   if (!user.email) {
