@@ -21,6 +21,8 @@ export const checkUserInDb = async (userEmail: string) => {
       },
     });
   }
+
+  return { dbUserId: dbuser?.email };
 };
 
 export const createCheckoutSession = async ({
