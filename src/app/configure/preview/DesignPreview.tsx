@@ -180,32 +180,28 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     },
   });
 
-  const { mutate: checkUserInDataBase } = useMutation({
-    mutationKey: ["checkUser"],
-    mutationFn: async () => {
-      const res = await fetch("/api/preview/check-user", {
+  const checkUserInDataBase = async () => {
+    try {
+      const response = await fetch("/api/user/check", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user?.id,
+          email: user?.email,
+        }),
       });
-      if (!res.ok) {
-        const text = await res.text();
-        try {
-          const j = JSON.parse(text);
-          throw new Error(j?.error ?? JSON.stringify(j));
-        } catch {
-          throw new Error(text || "Check user failed");
-        }
+
+      if (!response.ok) {
+        throw new Error("Failed to sync user with database");
       }
-      return res.json();
-    },
-    onError: (err: Error) => {
-      const message = err?.message ?? String(err);
-      console.error("check-user error:", err);
-      toast("Cannot find user or add it to DB", {
-        description:
-          message || "Cannot find user or add it to DB, Please try again.",
+    } catch (error) {
+      console.error("Error checking user in database:", error);
+      toast("Error", {
+        description: "Failed to sync user information",
       });
-    },
-  });
+      throw error;
+    }
+  };
 
   const handleCheckout = () => {
     if (user) {

@@ -11,7 +11,7 @@ export const checkUserInDb = async () => {
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged in heckUserInDb ");
+    throw new Error("You need to be logged in");
   }
 
   if (!user.email) {
@@ -48,19 +48,23 @@ export const createCheckoutSession = async ({
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You need to be logged in createCheckoutSession");
+    throw new Error("You need to be logged in");
   }
 
   if (!user.email) {
     throw new Error("Kinde user have no email");
   }
 
-  const dbuser = await db.user.findFirst({
+  let dbuser = await db.user.findFirst({
     where: { email: user.email },
   });
 
   if (!dbuser) {
-    throw new Error("User is not in DB");
+    dbuser = await db.user.create({
+      data: {
+        email: user.email,
+      },
+    });
   }
 
   const { finish, material } = configuration;
