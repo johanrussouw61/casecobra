@@ -10,12 +10,14 @@ export const checkUserInDb = async () => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
+  console.log("checkUserInDb - user:", user);
+
   if (!user) {
     throw new Error("You need to be logged in");
   }
 
   if (!user.email) {
-    throw new Error("Kinde user have no email");
+    throw new Error("User email not found");
   }
 
   const dbuser = await db.user.findFirst({
@@ -52,7 +54,7 @@ export const createCheckoutSession = async ({
   }
 
   if (!user.email) {
-    throw new Error("Kinde user have no email");
+    throw new Error("User email not found");
   }
 
   let dbuser = await db.user.findFirst({
