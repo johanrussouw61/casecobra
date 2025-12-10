@@ -151,7 +151,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
       const res = await fetch("/api/preview/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ configId }),
+        body: JSON.stringify({ configId, userEmail: user?.email }),
       });
       if (!res.ok) {
         const text = await res.text();
@@ -185,6 +185,7 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
       const response = await fetch("/api/preview/check-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: user?.email }),
       });
 
       if (!response.ok) {

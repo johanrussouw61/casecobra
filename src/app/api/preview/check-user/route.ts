@@ -1,21 +1,20 @@
 "use server";
-import { NextResponse } from "next/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { NextResponse, NextRequest } from "next/server";
 import { checkUserInDb } from "@/app/configure/preview/actions";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const body = await req.json();
+    const { userEmail } = body as { userEmail: string };
 
-    if (!user?.email) {
+    if (!userEmail) {
       return NextResponse.json(
         { error: "You need to be logged in" },
         { status: 401 }
       );
     }
 
-    await checkUserInDb(user.email);
+    await checkUserInDb(userEmail);
     return NextResponse.json({ ok: true });
   } catch (err) {
     const message =

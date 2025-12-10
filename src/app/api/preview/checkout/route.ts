@@ -1,29 +1,29 @@
 "use server";
-import { NextResponse } from "next/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { NextResponse, NextRequest } from "next/server";
 import { createCheckoutSession } from "@/app/configure/preview/actions";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const body = await req.json();
+    const { configId, userEmail } = body as {
+      configId: string;
+      userEmail: string;
+    };
 
-    if (!user?.email) {
+    if (!configId) {
+      return new NextResponse("Missing configId", { status: 400 });
+    }
+
+    if (!userEmail) {
       return NextResponse.json(
         { error: "You need to be logged in" },
         { status: 401 }
       );
     }
 
-    const body = await req.json();
-    const { configId } = body as { configId: string };
-    if (!configId) {
-      return new NextResponse("Missing configId", { status: 400 });
-    }
-
     const result = await createCheckoutSession({
       configId,
-      userEmail: user.email,
+      userEmail,
     });
     return NextResponse.json(result);
   } catch (error) {
