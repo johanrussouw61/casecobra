@@ -7,7 +7,7 @@ import { Order } from "@prisma/client";
 
 export const checkUserInDb = async (userEmail: string) => {
   if (!userEmail) {
-    throw new Error("User email not found");
+    throw new Error("User email not found not passed");
   }
 
   const dbuser = await db.user.findFirst({
@@ -41,7 +41,7 @@ export const createCheckoutSession = async ({
   }
 
   if (!userEmail) {
-    throw new Error("User email not found");
+    throw new Error("User email not found not passed");
   }
 
   let dbuser = await db.user.findFirst({
