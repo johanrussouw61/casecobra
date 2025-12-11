@@ -56,6 +56,14 @@ export const createCheckoutSession = async ({
     });
   }
 
+  dbuser = await db.user.findFirst({
+    where: { email: userEmail },
+  });
+
+  if (!dbuser) {
+    throw new Error("User not in db");
+  }
+
   const { finish, material } = configuration;
 
   let price = BASE_PRICE;
@@ -100,7 +108,7 @@ export const createCheckoutSession = async ({
       order!.id
     }`,
     cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/configure/preview?id=${configuration.id}`,
-    payment_method_types: ["card", "paypal"],
+    payment_method_types: ["card"],
     mode: "payment",
     shipping_address_collection: { allowed_countries: ["DE", "US"] },
     metadata: {
