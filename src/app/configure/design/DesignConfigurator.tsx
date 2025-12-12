@@ -46,7 +46,7 @@ const DesignConfigurator = ({
   imageDimensions,
 }: DesignConfiguratorProps) => {
   const router = useRouter();
-  const { mutate: saveConfig } = useMutation({
+  const { mutate: saveConfig, isPending } = useMutation({
     mutationKey: ["save-config"],
     mutationFn: async (args: SafeConfigArgs) => {
       await Promise.all([saveConfiguration(), _saveConfig(args)]);
@@ -476,6 +476,9 @@ const DesignConfigurator = ({
               </p>
               <div className="bg-green-500 w-full flex flex-col items-center justify-center">
                 <Button
+                  isLoading={isPending}
+                  disabled={isPending}
+                  loadingText="Saving"
                   onClick={() =>
                     saveConfig({
                       configId,
