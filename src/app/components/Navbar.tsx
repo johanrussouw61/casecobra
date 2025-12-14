@@ -16,10 +16,14 @@ const Navbar = async () => {
             case<span className="text-green-600">cobra</span>
           </Link>
           <div className="h-full flex items-center space-x-4">
+            <span className="hidden sm:inline-block text-sm text-zinc-700 mr-3">
+              Current User: {user?.email ?? "—"}
+            </span>
             {user ? (
               <>
                 <Link
                   href="/api/auth/logout"
+                  prefetch={false}
                   className={buttonVariants({
                     size: "sm",
                     variant: "ghost",
@@ -31,6 +35,7 @@ const Navbar = async () => {
                 {isAdmin ? (
                   <Link
                     href="/api/auth/logout"
+                    prefetch={false}
                     className={buttonVariants({
                       size: "sm",
                       variant: "ghost",
@@ -54,6 +59,7 @@ const Navbar = async () => {
               <>
                 <Link
                   href="/api/auth/register"
+                  prefetch={false}
                   className={buttonVariants({
                     size: "sm",
                     variant: "ghost",
@@ -64,6 +70,7 @@ const Navbar = async () => {
 
                 <Link
                   href="/api/auth/login"
+                  prefetch={false}
                   className={buttonVariants({
                     size: "sm",
                     variant: "ghost",
