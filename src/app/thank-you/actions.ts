@@ -2,23 +2,10 @@
 
 import { db } from "../db";
 
-export const getPaymentStatus = async ({
-  orderId,
-  userEmail,
-}: {
-  orderId: string;
-  userEmail: string;
-}) => {
-  const user = await db.user.findFirst({
-    where: { email: userEmail },
-  });
-
-  if (!user?.id || !user.email) {
-    throw new Error("You need to be logged in to view this page.");
-  }
-
+export const getPaymentStatus = async ({ orderId }: { orderId: string }) => {
+  // Fetch order first to get the user
   const order = await db.order.findFirst({
-    where: { id: orderId, userId: user.id },
+    where: { id: orderId },
     include: {
       billingAddress: true,
       configuration: true,

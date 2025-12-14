@@ -12,16 +12,11 @@ const ThankYou = () => {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId") || "";
   const { user } = useKindeBrowserClient();
-  const userEmail = user?.email;
   console.log("Thank you user:", user);
 
-  if (!userEmail) {
-    throw new Error("You must be logged in");
-  }
-
   const { data } = useQuery({
-    queryKey: ["get-payment-status"],
-    queryFn: async () => await getPaymentStatus({ orderId, userEmail }),
+    queryKey: ["get-payment-status", orderId],
+    queryFn: async () => await getPaymentStatus({ orderId }),
     retry: true,
     retryDelay: 500,
   });
