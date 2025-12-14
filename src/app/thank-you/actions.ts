@@ -13,7 +13,7 @@ export const getPaymentStatus = async ({ orderId }: { orderId: string }) => {
   // Fetch order first to get the user
 
   const order = await db.order.findFirst({
-    where: { id: orderId },
+    where: { id: orderId, userId: user.id },
     include: {
       billingAddress: true,
       configuration: true,
