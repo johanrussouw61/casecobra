@@ -13,6 +13,7 @@ const ThankYou = () => {
   const orderId = searchParams.get("orderId") || "";
   const { user } = useKindeBrowserClient();
   const userEmail = user?.email;
+  console.log("Thank you user:", user);
 
   if (!userEmail) {
     throw new Error("You must be logged in");
