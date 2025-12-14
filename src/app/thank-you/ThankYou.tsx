@@ -5,15 +5,22 @@ import { getPaymentStatus } from "./actions";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 //import PhonePreview from '@/components/PhonePreview'
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { formatPrice } from "@/lib/utils";
 
 const ThankYou = () => {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId") || "";
+  const { user } = useKindeBrowserClient();
+  const userEmail = user?.email;
+
+  if (!userEmail) {
+    throw new Error("You must be logged in");
+  }
 
   const { data } = useQuery({
     queryKey: ["get-payment-status"],
-    queryFn: async () => await getPaymentStatus({ orderId }),
+    queryFn: async () => await getPaymentStatus({ orderId, userEmail }),
     retry: true,
     retryDelay: 500,
   });
