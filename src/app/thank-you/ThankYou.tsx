@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 //import PhonePreview from '@/components/PhonePreview'
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { formatPrice } from "@/lib/utils";
+import PhonePreview from "../components/PhonePreview";
 
 const ThankYou = () => {
   const searchParams = useSearchParams();
@@ -45,9 +46,8 @@ const ThankYou = () => {
     );
   }
 
-  const { billingAddress, shippingAddress, amount } = data;
-  //const { configuration, billingAddress, shippingAddress, amount } = data
-  //const { color } = configuration
+  const { configuration, billingAddress, shippingAddress, amount } = data;
+  const { color } = configuration;
 
   return (
     <div className="bg-white">
@@ -81,6 +81,13 @@ const ThankYou = () => {
           </div>
         </div>
         {/* phone preview */}
+
+        <div className="flex space-x-6 overflow-hidden mt-4 rounded-xl bg-gray-900/5 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl">
+          <PhonePreview
+            croppedImageUrl={configuration.croppedImageUrl!}
+            color={color!}
+          />
+        </div>
 
         <div>
           <div className="grid grid-cols-2 gap-x-6 py-10 text-sm">
