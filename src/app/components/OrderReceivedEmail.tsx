@@ -23,11 +23,12 @@ const OrderReceivedEmail = ({
   orderId: string;
   orderDate: string;
 }) => {
-  const baseUrl =
-    process.env.NODE_ENV === "development"
+  const baseUrl = "https://casecobra.vercel-peach.app";
+  /*
+  process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : "https://casecobra.vercel-peach.app";
-
+*/
   return (
     <Html>
       <Head />
