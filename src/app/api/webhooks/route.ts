@@ -67,25 +67,59 @@ export async function POST(req: Request) {
     });
     console.log("customer email: ", session.customer_details!.email!);
 
-    await resend.emails.send({
-      from: "CaseCobra <hello@joshtriedcoding.com>",
-      to: [session.customer_details!.email!],
-      subject: "Thanks for your order!",
-      react: OrderReceivedEmail({
-        orderId,
-        orderDate: updatedOrder.createdAt.toLocaleDateString(),
-        shippingAddress: {
-          name: session.customer_details!.name!,
-          city: shippingAddress!.city!,
-          country: shippingAddress!.country!,
-          postalCode: shippingAddress!.postal_code!,
-          street: shippingAddress!.line1!,
-          state: shippingAddress!.state,
-          id: "",
-          phoneNumber: null,
-        },
-      }),
-    });
+    if (!process.env.RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY environment variable");
+      return NextResponse.json(
+        { message: "Missing RESEND_API_KEY", ok: false },
+        { status: 500 }
+      );
+    }
+
+    try {
+      await resend.emails.send({
+        from: "CaseCobra <hello@joshtriedcoding.com>",
+        to: [session.customer_details!.email!],
+        subject: "Thanks for your order!",
+        react: OrderReceivedEmail({
+          orderId,
+          orderDate: updatedOrder.createdAt.toLocaleDateString(),
+          shippingAddress: {
+            name: session.customer_details!.name!,
+            city: shippingAddress!.city!,
+            country: shippingAddress!.country!,
+            postalCode: shippingAddress!.postal_code!,
+            street: shippingAddress!.line1!,
+            state: shippingAddress!.state,
+            id: "",
+            phoneNumber: null,
+          },
+        }),
+      });
+    } catch (sendErr) {
+      console.error("Resend error sending email:", sendErr);
+      const status =
+        (
+          sendErr as unknown as {
+            response?: { status?: number };
+            status?: number;
+          }
+        )?.response?.status ||
+        (
+          sendErr as unknown as {
+            response?: { status?: number };
+            status?: number;
+          }
+        )?.status;
+      if (status === 403) {
+        console.error(
+          "Resend returned 403. Check RESEND_API_KEY and account/sender permissions."
+        );
+      }
+      return NextResponse.json(
+        { message: "Failed to send email via Resend", ok: false },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ result: event, ok: true });
   } catch (err) {
