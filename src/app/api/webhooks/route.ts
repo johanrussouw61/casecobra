@@ -65,6 +65,7 @@ export async function POST(req: Request) {
         },
       },
     });
+    console.log("customer email: ", session.customer_details!.email!);
 
     await resend.emails.send({
       from: "CaseCobra <hello@joshtriedcoding.com>",
