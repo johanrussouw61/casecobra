@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         },
       },
     });
-    console.log("customer email: ", session.customer_details!.email!);
+    //console.log("customer email: ", session.customer_details!.email!);
 
     if (!process.env.RESEND_API_KEY) {
       console.error("Missing RESEND_API_KEY environment variable");
@@ -76,8 +76,8 @@ export async function POST(req: Request) {
     }
 
     try {
-      await resend.emails.send({
-        from: "CaseCobra <hello@joshtriedcoding.com>",
+      const emailResult = await resend.emails.send({
+        from: "johanrussouw490@gmail.com",
         to: [session.customer_details!.email!],
         subject: "Thanks for your order!",
         react: OrderReceivedEmail({
@@ -95,6 +95,7 @@ export async function POST(req: Request) {
           },
         }),
       });
+      console.log("EmailResult: ", emailResult);
     } catch (sendErr) {
       console.error("Resend error sending email:", sendErr);
       const status =
